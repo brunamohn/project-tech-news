@@ -42,8 +42,22 @@ def scrape_next_page_link(html_content):
 
 # Requisito 4
 def scrape_news(html_content):
-    """Seu código deve vir aqui"""
-    raise NotImplementedError
+    selector = parsel.Selector(text=html_content)
+
+    news_info = {
+        "url": selector.css("link[rel=canonical]::attr(href)").get(),
+        "title": selector.css(".entry-title::text").get().strip(),
+        "timestamp": selector.css(".meta-date::text").get(),
+        "writer": selector.css(".author a::text").get(),
+        "reading_time": int(
+            selector.css(".meta-reading-time::text").re_first(r"(\d+)")
+        ),
+        "summary": selector.xpath(
+            "string(//div[contains(@class, 'content')]//p[1])").get().strip(),
+        "category": selector.css(".meta-category .label::text").get(),
+    }
+
+    return news_info
 
 
 # Requisito 5
